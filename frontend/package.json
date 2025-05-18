@@ -1,12 +1,11 @@
 {
-  "name": "filesys-frontend",
+  "name": "file-download-frontend",
   "version": "1.0.0",
-  "description": "File System Frontend",
+  "description": "Frontend for file download system",
   "scripts": {
-    "build": "tailwindcss -i ./src/input.css -o ./dist/output.css",
-    "watch": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch"
+    "start": "serve -s ."
   },
-  "devDependencies": {
-    "tailwindcss": "^3.4.1"
+  "dependencies": {
+    "serve": "^14.2.1"
   }
 } 

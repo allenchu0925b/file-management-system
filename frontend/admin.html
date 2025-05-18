@@ -100,51 +100,69 @@
                 </div>`;
         }
 
+        // 顯示通知
+        function showNotification(message, isError = false) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg ${
+                isError ? 'bg-red-500' : 'bg-green-500'
+            } text-white`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
         // 載入數據
         async function loadData() {
             try {
                 const response = await fetch('https://filesys-backend.onrender.com/api/files/all');
                 if (!response.ok) {
-                    throw new Error('載入資料失敗');
+                    const error = await response.json();
+                    throw new Error(error.error || '載入資料失敗');
                 }
                 const data = await response.json();
                 renderData(data);
             } catch (error) {
                 console.error('載入資料錯誤:', error);
-                alert('載入資料失敗: ' + error.message);
+                showNotification(error.message, true);
             }
         }
 
         // 新增或修改資料
         async function addData() {
-            const name = document.getElementById('name').value;
-            const videoLink = document.getElementById('videoLink').value;
-            const mp3Link = document.getElementById('mp3Link').value;
-            const textLink = document.getElementById('textLink').value;
+            const name = document.getElementById('name').value.trim();
+            const videoLink = document.getElementById('videoLink').value.trim();
+            const mp3Link = document.getElementById('mp3Link').value.trim();
+            const textLink = document.getElementById('textLink').value.trim();
 
-            if (name && videoLink && mp3Link && textLink) {
-                try {
-                    const url = editingId ? `https://filesys-backend.onrender.com/api/files/${editingId}` : 'https://filesys-backend.onrender.com/api/files';
-                    const method = editingId ? 'PUT' : 'POST';
-                    const response = await fetch(url, {
-                        method,
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ name, videoLink, mp3Link, textLink })
-                    });
-                    if (response.ok) {
-                        editingId = null;
-                        clearInputs();
-                        loadData();
-                    } else {
-                        alert('儲存失敗');
-                    }
-                } catch (error) {
-                    alert('儲存錯誤');
+            if (!name || !videoLink || !mp3Link || !textLink) {
+                showNotification('請填寫所有欄位', true);
+                return;
+            }
+
+            try {
+                const url = editingId ? 
+                    `https://filesys-backend.onrender.com/api/files/${editingId}` : 
+                    'https://filesys-backend.onrender.com/api/files';
+                const method = editingId ? 'PUT' : 'POST';
+                const response = await fetch(url, {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, videoLink, mp3Link, textLink })
+                });
+                
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || '儲存失敗');
                 }
-            } else {
-                alert('請填寫所有欄位');
+
+                editingId = null;
+                clearInputs();
+                loadData();
+                showNotification(editingId ? '更新成功' : '新增成功');
+            } catch (error) {
+                showNotification(error.message, true);
             }
         }
 
@@ -168,18 +186,21 @@
 
         // 刪除資料
         async function deleteData(id) {
-            if (confirm('確定要刪除嗎？')) {
+            if (confirm('確定要刪除嗎？此操作無法復原。')) {
                 try {
                     const response = await fetch(`https://filesys-backend.onrender.com/api/files/${id}`, {
                         method: 'DELETE'
                     });
-                    if (response.ok) {
-                        loadData();
-                    } else {
-                        alert('刪除失敗');
+                    
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.error || '刪除失敗');
                     }
+                    
+                    loadData();
+                    showNotification('刪除成功');
                 } catch (error) {
-                    alert('刪除錯誤');
+                    showNotification(error.message, true);
                 }
             }
         }

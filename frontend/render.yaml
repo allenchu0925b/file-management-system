@@ -1,0 +1,9 @@
+services:
+  - type: static
+    name: filesys-frontend
+    buildCommand: npm install
+    staticPublishPath: .
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache 
