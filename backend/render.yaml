@@ -3,11 +3,9 @@ services:
     name: filesys-backend
     env: node
     buildCommand: npm install
-    startCommand: node start.js
+    startCommand: node server.js
     envVars:
       - key: MONGO_URI
-        sync: false
-      - key: JWT_SECRET
         sync: false
       - key: PORT
         value: 10000 

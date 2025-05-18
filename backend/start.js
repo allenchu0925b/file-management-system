@@ -6,10 +6,5 @@ if (!process.env.MONGO_URI) {
     process.exit(1);
 }
 
-if (!process.env.JWT_SECRET) {
-    console.error('錯誤：未設置 JWT_SECRET 環境變數');
-    process.exit(1);
-}
-
 // 啟動服務器
 require('./server.js'); 
