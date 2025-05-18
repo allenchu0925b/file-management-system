@@ -6,6 +6,40 @@
     <title>檔案管理系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 300px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+            word-break: break-all;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .link-cell {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
 </head>
 <body class="bg-gradient-to-r from-blue-100 to-gray-100">
     <!-- 編輯頁面 -->
@@ -35,6 +69,36 @@
 
     <script>
         let editingId = null;
+
+        // 複製文字到剪貼簿
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('已複製到剪貼簿');
+            }).catch(err => {
+                console.error('複製失敗:', err);
+            });
+        }
+
+        // 格式化連結顯示
+        function formatLinkCell(link, type) {
+            if (!link) return '';
+            const shortLink = link.length > 30 ? link.substring(0, 27) + '...' : link;
+            return `
+                <div class="tooltip link-cell">
+                    <span class="tooltiptext">${link}</span>
+                    <span class="text-blue-600">${shortLink}</span>
+                    <div class="mt-1 space-x-1">
+                        <button onclick="copyToClipboard('${link.replace(/'/g, "&#39;")}')" 
+                                class="text-gray-600 hover:text-blue-600" title="複製連結">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <a href="${link}" target="_blank" 
+                           class="text-gray-600 hover:text-blue-600" title="開啟連結">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                </div>`;
+        }
 
         // 載入數據
         async function loadData() {
@@ -129,14 +193,16 @@
                 row.className = 'hover:bg-gray-50';
                 row.innerHTML = `
                     <td class="p-3">${item.name}</td>
-                    <td class="p-3">${item.videoLink}</td>
-                    <td class="p-3">${item.mp3Link}</td>
-                    <td class="p-3">${item.textLink}</td>
+                    <td class="p-3">${formatLinkCell(item.videoLink, 'video')}</td>
+                    <td class="p-3">${formatLinkCell(item.mp3Link, 'audio')}</td>
+                    <td class="p-3">${formatLinkCell(item.textLink, 'text')}</td>
                     <td class="p-3">
-                        <button onclick="editData(${JSON.stringify(item)})" class="bg-blue-500 text-white px-2 py-1 rounded mr-2 hover:bg-blue-600">
+                        <button onclick='editData(${JSON.stringify(item).replace(/'/g, "&#39;")})' 
+                                class="bg-blue-500 text-white px-2 py-1 rounded mr-2 hover:bg-blue-600">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button onclick="deleteData('${item._id}')" class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">
+                        <button onclick="deleteData('${item._id}')" 
+                                class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
