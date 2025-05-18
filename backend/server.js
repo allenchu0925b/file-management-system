@@ -13,9 +13,11 @@ const app = express();
 // CORS 設定
 app.use(cors({
     origin: '*',  // 允許所有來源
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+    exposedHeaders: ['Content-Range', 'X-Content-Range'],
+    credentials: false,  // 改為 false，因為使用 '*' 時不能設為 true
+    maxAge: 86400  // 預檢請求的快取時間，單位為秒
 }));
 
 // 中間件
