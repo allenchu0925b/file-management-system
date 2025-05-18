@@ -116,18 +116,47 @@
         // 載入數據
         async function loadData() {
             try {
-                const response = await fetch(`${API_BASE_URL}/files/all`, {
-                    credentials: 'include'
+                console.log('開始發送請求到:', `${API_BASE_URL}/files/all`);
+                console.log('請求設置:', {
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
                 });
+
+                const response = await fetch(`${API_BASE_URL}/files/all`, {
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    mode: 'cors'  // 明確指定使用 CORS
+                });
+
+                console.log('收到回應:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers: Object.fromEntries([...response.headers.entries()]),
+                    ok: response.ok
+                });
+
                 if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || '載入資料失敗');
+                    const errorText = await response.text();
+                    console.error('回應內容:', errorText);
+                    throw new Error(`HTTP 錯誤! 狀態: ${response.status}, 訊息: ${errorText}`);
                 }
+
                 const data = await response.json();
+                console.log('成功獲取數據:', data);
                 renderData(data);
             } catch (error) {
-                console.error('載入資料錯誤:', error);
-                showNotification(error.message, true);
+                console.error('載入數據時發生錯誤:', {
+                    message: error.message,
+                    stack: error.stack,
+                    type: error.name
+                });
+                showNotification(`載入失敗: ${error.message}`, true);
             }
         }
 
@@ -148,26 +177,51 @@
                     `${API_BASE_URL}/files/${editingId}` : 
                     `${API_BASE_URL}/files`;
                 const method = editingId ? 'PUT' : 'POST';
+                
+                console.log('準備發送請求:', {
+                    url,
+                    method,
+                    data: { name, videoLink, mp3Link, textLink }
+                });
+
                 const response = await fetch(url, {
                     method,
                     credentials: 'include',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     },
+                    mode: 'cors',
                     body: JSON.stringify({ name, videoLink, mp3Link, textLink })
                 });
-                
-                const data = await response.json();
+
+                console.log('收到回應:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers: Object.fromEntries([...response.headers.entries()]),
+                    ok: response.ok
+                });
+
                 if (!response.ok) {
-                    throw new Error(data.error || '儲存失敗');
+                    const errorText = await response.text();
+                    console.error('回應內容:', errorText);
+                    throw new Error(`操作失敗: ${response.status} ${errorText}`);
                 }
+
+                const data = await response.json();
+                console.log('操作成功:', data);
 
                 editingId = null;
                 clearInputs();
                 loadData();
                 showNotification(editingId ? '更新成功' : '新增成功');
             } catch (error) {
-                showNotification(error.message, true);
+                console.error('操作失敗:', {
+                    message: error.message,
+                    stack: error.stack,
+                    type: error.name
+                });
+                showNotification(`操作失敗: ${error.message}`, true);
             }
         }
 
