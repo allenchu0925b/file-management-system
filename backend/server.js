@@ -10,15 +10,19 @@ Buffer.from('中文測試'); // 強制 Node.js 使用 UTF-8
 dotenv.config();
 const app = express();
 
-// CORS 設定
-app.use(cors({
-    origin: '*',  // 允許所有來源
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
-    exposedHeaders: ['Content-Range', 'X-Content-Range'],
-    credentials: false,  // 改為 false，因為使用 '*' 時不能設為 true
-    maxAge: 86400  // 預檢請求的快取時間，單位為秒
-}));
+// 啟用 CORS，允許所有來源
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    
+    // 處理 OPTIONS 請求
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+    next();
+});
 
 // 中間件
 app.use(express.json());
