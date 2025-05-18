@@ -12,7 +12,7 @@ const app = express();
 
 // CORS 設定
 app.use(cors({
-    origin: ['http://localhost:8080', 'http://127.0.0.1:8080', 'https://filesys-backend.onrender.com'],
+    origin: '*',  // 允許所有來源
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
