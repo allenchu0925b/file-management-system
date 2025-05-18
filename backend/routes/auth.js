@@ -9,6 +9,30 @@ router.get('/test', (req, res) => {
     res.json({ message: '認證路由正常運作' });
 });
 
+// 初始化管理員帳號
+router.post('/init-admin', async (req, res) => {
+    try {
+        // 檢查是否已存在管理員
+        const adminExists = await User.findOne({ role: 'admin' });
+        if (adminExists) {
+            return res.status(400).json({ message: '管理員帳號已存在' });
+        }
+
+        // 創建管理員帳號
+        const hashedPassword = await bcrypt.hash('testpassword', 10);
+        const admin = new User({
+            username: 'testadmin',
+            password: hashedPassword,
+            role: 'admin'
+        });
+
+        await admin.save();
+        res.status(201).json({ message: '管理員帳號創建成功' });
+    } catch (error) {
+        res.status(500).json({ message: '伺服器錯誤', error: error.message });
+    }
+});
+
 // 註冊路由
 router.post('/register', async (req, res) => {
     try {
