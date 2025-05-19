@@ -1,9 +1,14 @@
 services:
-  - type: static
-    name: filesys-frontend
-    buildCommand: npm install
-    staticPublishPath: .
+  - type: web
+    name: file-management-system
+    env: static
+    buildCommand: echo "No build required"
+    staticPublishPath: ./
     headers:
       - path: /*
         name: Cache-Control
-        value: no-cache 
+        value: no-cache
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html 
