@@ -5,6 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>管理員登入</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 表格樣式優化 */
+        #dataTable th, #dataTable td {
+            text-align: left; /* 左對齊 */
+            vertical-align: middle; /* 垂直居中 */
+        }
+        #dataTable .link-column {
+            max-width: 150px; /* 限制連結欄位寬度 */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; /* 過長時顯示省略號 */
+        }
+        #dataTable a {
+            color: #4f46e5; /* 超連結顏色 */
+            text-decoration: underline;
+        }
+        #dataTable a:hover {
+            color: #7c3aed; /* 滑鼠懸停時顏色 */
+        }
+    </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
     <div id="loginSection" class="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
@@ -100,7 +120,10 @@
                         },
                         body: JSON.stringify({ name, videoLink, mp3Link, textLink })
                     });
-                    if (!response.ok) throw new Error('儲存失敗');
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || '儲存失敗');
+                    }
                     alert('資料儲存成功!');
                     document.getElementById('name').value = '';
                     document.getElementById('videoLink').value = '';
@@ -122,7 +145,10 @@
                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
-                if (!response.ok) throw new Error('載入資料失敗');
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || '載入資料失敗');
+                }
                 const data = await response.json();
                 const tbody = document.getElementById('dataBody');
                 tbody.innerHTML = '';
@@ -130,10 +156,18 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td class="px-4 py-2 border">${item.name}</td>
-                        <td class="px-4 py-2 border">${item.videoLink || '-'}</td>
-                        <td class="px-4 py-2 border">${item.mp3Link || '-'}</td>
-                        <td class="px-4 py-2 border">${item.textLink || '-'}</td>
-                        <td class="px-4 py-2 border"><button class="delete-btn bg-red-600 text-white py-1 px-2 rounded-md hover:bg-red-700" data-id="${item._id}">刪除</button></td>
+                        <td class="px-4 py-2 border link-column">
+                            ${item.videoLink ? `<a href="${item.videoLink}" target="_blank" title="${item.videoLink}">觀看</a>` : '-'}
+                        </td>
+                        <td class="px-4 py-2 border link-column">
+                            ${item.mp3Link ? `<a href="${item.mp3Link}" target="_blank" title="${item.mp3Link}">播放</a>` : '-'}
+                        </td>
+                        <td class="px-4 py-2 border link-column">
+                            ${item.textLink ? `<a href="${item.textLink}" target="_blank" title="${item.textLink}">檢視</a>` : '-'}
+                        </td>
+                        <td class="px-4 py-2 border">
+                            <button class="delete-btn bg-red-600 text-white py-1 px-2 rounded-md hover:bg-red-700" data-id="${item._id}">刪除</button>
+                        </td>
                     `;
                     tbody.appendChild(row);
                 });
@@ -148,7 +182,10 @@
                                         'Authorization': `Bearer ${localStorage.getItem('token')}`
                                     }
                                 });
-                                if (!response.ok) throw new Error('刪除失敗');
+                                if (!response.ok) {
+                                    const errorData = await response.json();
+                                    throw new Error(errorData.error || '刪除失敗');
+                                }
                                 loadData();
                             } catch (error) {
                                 alert('錯誤: ' + error.message);
@@ -161,7 +198,6 @@
             }
         }
 
-        // 檢查 token 自動載入資料
         if (localStorage.getItem('token')) {
             document.getElementById('loginSection').classList.add('hidden');
             document.getElementById('dataSection').classList.remove('hidden');
