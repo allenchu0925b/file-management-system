@@ -32,10 +32,14 @@
         #dataTable .text-link { background-color: #f0f4c3; }
         /* 單行雙行背景色 - 更深 */
         #dataTable tbody tr:nth-child(odd) {
-            background-color: #e5e7eb; /* 較深的灰色 */
+            background-color: #e5e7eb;
         }
         #dataTable tbody tr:nth-child(even) {
-            background-color: #f3f4f6; /* 淺灰色 */
+            background-color: #f3f4f6;
+        }
+        /* 表格頭部色階更深 */
+        #dataTable thead tr {
+            background-color: #d1d5db; /* 更深的灰色 */
         }
     </style>
 </head>
@@ -104,7 +108,6 @@
                 }
                 const data = await response.json();
                 localStorage.setItem('token', data.token);
-                alert('登入成功!');
                 document.getElementById('loginSection').classList.add('hidden');
                 document.getElementById('dataSection').classList.remove('hidden');
                 loadData();
@@ -144,7 +147,6 @@
                         const errorData = await response.json();
                         throw new Error(errorData.error || (editId ? '修改失敗' : '儲存失敗'));
                     }
-                    alert(editId ? '資料修改成功!' : '資料儲存成功!');
                     resetForm();
                     loadData();
                 } catch (error) {
