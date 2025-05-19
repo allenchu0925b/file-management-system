@@ -1,14 +1,13 @@
 services:
-  - type: web
+  - type: static
     name: file-management-system
-    env: static
     buildCommand: echo "No build required"
-    staticPublishPath: ./
+    publishPath: ./
     headers:
       - path: /*
         name: Cache-Control
         value: no-cache
     routes:
       - type: rewrite
-        source: /*
+        source: /
         destination: /index.html 
