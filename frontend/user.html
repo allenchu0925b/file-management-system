@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>檔案下載</title>
+    <title>大日宗 本尊道DVD資料查詢系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         #fileTable th, #fileTable td {
@@ -29,16 +29,19 @@
         #fileTable .mp3-link { background-color: #e6fffa; }
         #fileTable .text-link { background-color: #f0f4c3; }
         #fileTable tbody tr:nth-child(odd) {
-            background-color: #e5e7eb;
+            background-color: #e5e7eb; /* 與 admin.html 一致 */
         }
         #fileTable tbody tr:nth-child(even) {
-            background-color: #f3f4f6;
+            background-color: #f3f4f6; /* 與 admin.html 一致 */
+        }
+        #fileTable thead tr {
+            background-color: #d1d5db; /* 與 admin.html 一致 */
         }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
     <div class="w-full max-w-4xl p-6 bg-white rounded-lg shadow-md">
-        <h2 class="text-2xl font-bold mb-6 text-center">檔案下載</h2>
+        <h2 class="text-2xl font-bold mb-6 text-center">大日宗 本尊道DVD資料查詢系統</h2>
         <div id="loading" class="text-center mb-4">
             <p>載入中...</p>
         </div>
