@@ -63,13 +63,12 @@
     </div>
 
     <script>
-        const API_BASE_URL = 'https://filesys-backend.onrender.com/api';
+        const API_BASE_URL = 'https://filesys-backend-1.onrender.com/api';
 
         // 載入數據
         async function loadData() {
             try {
                 const response = await fetch(`${API_BASE_URL}/files/all`, {
-                    credentials: 'include',
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
