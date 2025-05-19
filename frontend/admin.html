@@ -27,15 +27,15 @@
             color: #7c3aed;
         }
         /* 為超連結設置底色 */
-        #dataTable .video-link { background-color: #e0f7fa; } /* 淺藍 */
-        #dataTable .mp3-link { background-color: #e6fffa; } /* 淺青 */
-        #dataTable .text-link { background-color: #f0f4c3; } /* 淺黃 */
-        /* 單行雙行背景色 */
+        #dataTable .video-link { background-color: #e0f7fa; }
+        #dataTable .mp3-link { background-color: #e6fffa; }
+        #dataTable .text-link { background-color: #f0f4c3; }
+        /* 單行雙行背景色 - 更深 */
         #dataTable tbody tr:nth-child(odd) {
-            background-color: #f9fafb; /* 單行淺灰 */
+            background-color: #e5e7eb; /* 較深的灰色 */
         }
         #dataTable tbody tr:nth-child(even) {
-            background-color: #ffffff; /* 雙行白色 */
+            background-color: #f3f4f6; /* 淺灰色 */
         }
     </style>
 </head>
@@ -57,7 +57,7 @@
 
     <div id="dataSection" class="hidden w-full max-w-4xl p-6 bg-white rounded-lg shadow-md mt-6">
         <h2 class="text-2xl font-bold mb-6 text-center">大日宗 本尊道DVD影片資料編輯系統</h2>
-        <button id="logoutBtn" class="mb-4 bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">登出</button>
+        <button id="logoutBtn" class="mb-4 bg-red-700 text-white py-2 px-4 rounded-md hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">登出</button>
         <div id="addDataSection" class="mb-6">
             <h3 class="text-lg font-medium mb-2">新增/修改資料</h3>
             <div class="space-y-2">
@@ -66,7 +66,7 @@
                 <input type="text" id="videoLink" class="block w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="影片連結">
                 <input type="text" id="mp3Link" class="block w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="MP3連結">
                 <input type="text" id="textLink" class="block w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="文字檔連結">
-                <button id="saveBtn" class="bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">儲存</button>
+                <button id="saveBtn" class="bg-green-700 text-white py-2 px-4 rounded-md hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">儲存</button>
                 <button id="cancelEditBtn" class="hidden bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">取消修改</button>
             </div>
         </div>
@@ -197,14 +197,13 @@
                             ${item.textLink ? `<a href="${item.textLink}" target="_blank" title="${item.textLink}" class="text-link">檢視</a>` : '-'}
                         </td>
                         <td class="px-4 py-2 border">
-                            <button class="edit-btn bg-blue-600 text-white py-1 px-2 rounded-md hover:bg-blue-700 mr-2" data-id="${item._id}">修改</button>
-                            <button class="delete-btn bg-red-600 text-white py-1 px-2 rounded-md hover:bg-red-700" data-id="${item._id}">刪除</button>
+                            <button class="edit-btn bg-blue-700 text-white py-1 px-2 rounded-md hover:bg-blue-800 mr-2" data-id="${item._id}">修改</button>
+                            <button class="delete-btn bg-red-700 text-white py-1 px-2 rounded-md hover:bg-red-800" data-id="${item._id}">刪除</button>
                         </td>
                     `;
                     tbody.appendChild(row);
                 });
 
-                // 綁定修改按鈕事件
                 document.querySelectorAll('.edit-btn').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const id = btn.getAttribute('data-id');
@@ -224,7 +223,6 @@
                     });
                 });
 
-                // 綁定刪除按鈕事件
                 document.querySelectorAll('.delete-btn').forEach(btn => {
                     btn.addEventListener('click', async () => {
                         const id = btn.getAttribute('data-id');
