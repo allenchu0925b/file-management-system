@@ -98,7 +98,7 @@
             $('#filesTable tbody').empty();
 
             $.ajax({
-                url: `https://filesys-backend.onrender.com/api/files?sort=name&order=${sortOrder}`, // 替換為實際後端域名
+                url: `https://filesys-backend-1.onrender.com/api/files?sort=name&order=${sortOrder}`, // 使用實際後端域名
                 method: 'GET',
                 success: function(files) {
                     $('#loading').hide();
