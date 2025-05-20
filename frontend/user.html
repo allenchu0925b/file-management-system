@@ -98,10 +98,8 @@
             $('#filesTable tbody').empty();
 
             $.ajax({
-                url: `/api/files?sort=name&order=${sortOrder}`, // 相對路徑，與 admin.html 一致
+                url: `https://filesys-backend.onrender.com/api/files?sort=name&order=${sortOrder}`, // 替換為實際後端域名
                 method: 'GET',
-                // 如果需要認證，添加頭部（參照 admin.html）
-                // headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                 success: function(files) {
                     $('#loading').hide();
                     if (files.length === 0) {
@@ -122,7 +120,7 @@
                 error: function(xhr, status, error) {
                     $('#loading').hide();
                     $('#error').show();
-                    console.error('API 錯誤:', status, error); // 調試用
+                    console.error('API 錯誤:', status, error);
                 }
             });
         }
