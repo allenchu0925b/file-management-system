@@ -26,20 +26,17 @@
         #dataTable a:hover {
             color: #7c3aed;
         }
-        /* 為超連結設置底色 */
         #dataTable .video-link { background-color: #e0f7fa; }
         #dataTable .mp3-link { background-color: #e6fffa; }
         #dataTable .text-link { background-color: #f0f4c3; }
-        /* 單行雙行背景色 - 更深 */
         #dataTable tbody tr:nth-child(odd) {
             background-color: #e5e7eb;
         }
         #dataTable tbody tr:nth-child(even) {
             background-color: #f3f4f6;
         }
-        /* 表格頭部色階更深 */
         #dataTable thead tr {
-            background-color: #d1d5db; /* 更深的灰色 */
+            background-color: #d1d5db;
         }
     </style>
 </head>
@@ -185,7 +182,7 @@
                 const data = await response.json();
                 const tbody = document.getElementById('dataBody');
                 tbody.innerHTML = '';
-                data.forEach(item => {
+                data.forEach((item, index) => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td class="px-4 py-2 border">${item.name}</td>
@@ -199,13 +196,64 @@
                             ${item.textLink ? `<a href="${item.textLink}" target="_blank" title="${item.textLink}" class="text-link">檢視</a>` : '-'}
                         </td>
                         <td class="px-4 py-2 border">
-                            <button class="edit-btn bg-blue-700 text-white py-1 px-2 rounded-md hover:bg-blue-800 mr-2" data-id="${item._id}">修改</button>
+                            <button class="move-up-btn bg-gray-600 text-white py-1 px-2 rounded-md hover:bg-gray-700 mr-1" data-id="${item._id}" ${index === 0 ? 'disabled' : ''}>移上</button>
+                            <button class="move-down-btn bg-gray-600 text-white py-1 px-2 rounded-md hover:bg-gray-700 mr-1" data-id="${item._id}" ${index === data.length - 1 ? 'disabled' : ''}>移下</button>
+                            <button class="edit-btn bg-blue-700 text-white py-1 px-2 rounded-md hover:bg-blue-800 mr-1" data-id="${item._id}">修改</button>
                             <button class="delete-btn bg-red-700 text-white py-1 px-2 rounded-md hover:bg-red-800" data-id="${item._id}">刪除</button>
                         </td>
                     `;
                     tbody.appendChild(row);
                 });
 
+                // 綁定移上按鈕
+                document.querySelectorAll('.move-up-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const id = btn.getAttribute('data-id');
+                        try {
+                            const response = await fetch('https://filesys-backend-1.onrender.com/api/files/reorder', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                },
+                                body: JSON.stringify({ id, direction: 'up' })
+                            });
+                            if (!response.ok) {
+                                const errorData = await response.json();
+                                throw new Error(errorData.error || '移動失敗');
+                            }
+                            loadData();
+                        } catch (error) {
+                            alert('錯誤: ' + error.message);
+                        }
+                    });
+                });
+
+                // 綁定移下按鈕
+                document.querySelectorAll('.move-down-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const id = btn.getAttribute('data-id');
+                        try {
+                            const response = await fetch('https://filesys-backend-1.onrender.com/api/files/reorder', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                },
+                                body: JSON.stringify({ id, direction: 'down' })
+                            });
+                            if (!response.ok) {
+                                const errorData = await response.json();
+                                throw new Error(errorData.error || '移動失敗');
+                            }
+                            loadData();
+                        } catch (error) {
+                            alert('錯誤: ' + error.message);
+                        }
+                    });
+                });
+
+                // 綁定修改按鈕
                 document.querySelectorAll('.edit-btn').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const id = btn.getAttribute('data-id');
@@ -225,6 +273,7 @@
                     });
                 });
 
+                // 綁定刪除按鈕
                 document.querySelectorAll('.delete-btn').forEach(btn => {
                     btn.addEventListener('click', async () => {
                         const id = btn.getAttribute('data-id');
