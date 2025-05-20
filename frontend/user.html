@@ -30,10 +30,10 @@
         th {
             background-color: #4CAF50;
             color: white;
-            cursor: pointer; /* 使名稱列看起來可點擊 */
+            cursor: pointer;
         }
         th:hover {
-            background-color: #45a049; /* 滑鼠懸停效果 */
+            background-color: #45a049;
         }
         tr:hover {
             background-color: #f1f1f1;
@@ -98,8 +98,10 @@
             $('#filesTable tbody').empty();
 
             $.ajax({
-                url: `/api/files?sort=name&order=${sortOrder}`,
+                url: `/api/files?sort=name&order=${sortOrder}`, // 相對路徑，與 admin.html 一致
                 method: 'GET',
+                // 如果需要認證，添加頭部（參照 admin.html）
+                // headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                 success: function(files) {
                     $('#loading').hide();
                     if (files.length === 0) {
@@ -117,9 +119,10 @@
                         $('#filesTable tbody').append(row);
                     });
                 },
-                error: function() {
+                error: function(xhr, status, error) {
                     $('#loading').hide();
                     $('#error').show();
+                    console.error('API 錯誤:', status, error); // 調試用
                 }
             });
         }
