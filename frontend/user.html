@@ -4,113 +4,130 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>大日宗 本尊道DVD資料查詢系統</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        #fileTable th, #fileTable td {
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 10px;
             text-align: left;
-            vertical-align: middle;
+            border-bottom: 1px solid #ddd;
         }
-        #fileTable .link-column {
-            max-width: 150px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        th {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer; /* 使名稱列看起來可點擊 */
         }
-        #fileTable a {
-            color: #4f46e5;
+        th:hover {
+            background-color: #45a049; /* 滑鼠懸停效果 */
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        a:hover {
             text-decoration: underline;
-            padding: 2px 6px;
-            border-radius: 4px;
         }
-        #fileTable a:hover {
-            color: #7c3aed;
+        #loading, #error {
+            text-align: center;
+            margin-top: 20px;
+            display: none;
         }
-        #fileTable .video-link { background-color: #e0f7fa; }
-        #fileTable .mp3-link { background-color: #e6fffa; }
-        #fileTable .text-link { background-color: #f0f4c3; }
-        #fileTable tbody tr:nth-child(odd) {
-            background-color: #e5e7eb; /* 與 admin.html 一致 */
+        #error button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
         }
-        #fileTable tbody tr:nth-child(even) {
-            background-color: #f3f4f6; /* 與 admin.html 一致 */
-        }
-        #fileTable thead tr {
-            background-color: #d1d5db; /* 與 admin.html 一致 */
+        #error button:hover {
+            background-color: #45a049;
         }
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-    <div class="w-full max-w-4xl p-6 bg-white rounded-lg shadow-md">
-        <h2 class="text-2xl font-bold mb-6 text-center">大日宗 本尊道DVD資料查詢系統</h2>
-        <div id="loading" class="text-center mb-4">
-            <p>載入中...</p>
-        </div>
-        <div id="error" class="hidden text-center mb-4 text-red-600">
-            <p id="errorMessage"></p>
-            <button id="retryBtn" class="mt-2 bg-blue-600 text-white py-1 px-3 rounded-md hover:bg-blue-700">重試</button>
-        </div>
-        <table id="fileTable" class="w-full text-left border-collapse">
-            <thead>
-                <tr class="bg-gray-200">
-                    <th class="px-4 py-2 border">名稱</th>
-                    <th class="px-4 py-2 border">影片</th>
-                    <th class="px-4 py-2 border">MP3</th>
-                    <th class="px-4 py-2 border">文字檔</th>
-                </tr>
-            </thead>
-            <tbody id="fileBody"></tbody>
-        </table>
+<body>
+    <h1>大日宗 本尊道DVD資料查詢系統</h1>
+    <div id="loading">載入中...</div>
+    <div id="error">
+        <p>無法載入資料，請稍後再試。</p>
+        <button onclick="loadFiles()">重試</button>
     </div>
+    <table id="filesTable">
+        <thead>
+            <tr>
+                <th id="nameHeader">名稱</th>
+                <th>影片</th>
+                <th>MP3</th>
+                <th>文字檔</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 
     <script>
-        async function loadFiles() {
-            const loading = document.getElementById('loading');
-            const error = document.getElementById('error');
-            const errorMessage = document.getElementById('errorMessage');
-            const fileBody = document.getElementById('fileBody');
+        let sortOrder = 'asc'; // 初始排序為升序
 
-            try {
-                loading.classList.remove('hidden');
-                error.classList.add('hidden');
-
-                const response = await fetch('https://filesys-backend-1.onrender.com/api/files');
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || '載入資料失敗');
-                }
-                const data = await response.json();
-
-                fileBody.innerHTML = '';
-                data.forEach(item => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td class="px-4 py-2 border">${item.name}</td>
-                        <td class="px-4 py-2 border link-column">
-                            ${item.videoLink ? `<a href="${item.videoLink}" target="_blank" title="${item.videoLink}" class="video-link">觀看</a>` : '-'}
-                        </td>
-                        <td class="px-4 py-2 border link-column">
-                            ${item.mp3Link ? `<a href="${item.mp3Link}" target="_blank" title="${item.mp3Link}" class="mp3-link">播放</a>` : '-'}
-                        </td>
-                        <td class="px-4 py-2 border link-column">
-                            ${item.textLink ? `<a href="${item.textLink}" target="_blank" title="${item.textLink}" class="text-link">檢視</a>` : '-'}
-                        </td>
-                    `;
-                    fileBody.appendChild(row);
-                });
-
-                loading.classList.add('hidden');
-            } catch (err) {
-                loading.classList.add('hidden');
-                error.classList.remove('hidden');
-                errorMessage.textContent = '錯誤: ' + err.message;
-            }
-        }
-
-        document.getElementById('retryBtn').addEventListener('click', () => {
+        // 點擊名稱標題時切換排序
+        $('#nameHeader').on('click', function() {
+            sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
             loadFiles();
         });
 
-        loadFiles();
+        // 加載檔案資料
+        function loadFiles() {
+            $('#loading').show();
+            $('#error').hide();
+            $('#filesTable tbody').empty();
+
+            $.ajax({
+                url: `/api/files?sort=name&order=${sortOrder}`,
+                method: 'GET',
+                success: function(files) {
+                    $('#loading').hide();
+                    if (files.length === 0) {
+                        $('#filesTable tbody').append('<tr><td colspan="4">無資料</td></tr>');
+                        return;
+                    }
+                    files.forEach(file => {
+                        const row = `
+                            <tr>
+                                <td>${file.name}</td>
+                                <td><a href="${file.videoLink}" target="_blank">影片</a></td>
+                                <td><a href="${file.mp3Link}" target="_blank">MP3</a></td>
+                                <td><a href="${file.textLink}" target="_blank">文字檔</a></td>
+                            </tr>`;
+                        $('#filesTable tbody').append(row);
+                    });
+                },
+                error: function() {
+                    $('#loading').hide();
+                    $('#error').show();
+                }
+            });
+        }
+
+        // 頁面載入時初始化
+        $(document).ready(function() {
+            loadFiles();
+        });
     </script>
 </body>
 </html>
