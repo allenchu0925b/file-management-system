@@ -27,13 +27,30 @@
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
-        th {
+        th#nameHeader {
             background-color: #4CAF50;
             color: white;
             cursor: pointer;
+            position: relative;
+            padding-right: 20px;
         }
-        th:hover {
+        th#nameHeader:hover {
             background-color: #45a049;
+            text-decoration: underline;
+        }
+        th#nameHeader::after {
+            content: '↕';
+            position: absolute;
+            right: 5px;
+            font-size: 12px;
+        }
+        .sort-arrow {
+            margin-left: 5px;
+            font-size: 12px;
+        }
+        th:not(#nameHeader) {
+            background-color: #4CAF50;
+            color: white;
         }
         tr:hover {
             background-color: #f1f1f1;
@@ -65,6 +82,7 @@
 </head>
 <body>
     <h1>大日宗 本尊道DVD資料查詢系統</h1>
+    <p style="text-align: center; color: #555; font-size: 14px;">提示：點擊「名稱」欄可切換排序</p>
     <div id="loading">載入中...</div>
     <div id="error">
         <p>無法載入資料，請稍後再試。</p>
@@ -73,7 +91,7 @@
     <table id="filesTable">
         <thead>
             <tr>
-                <th id="nameHeader">名稱</th>
+                <th id="nameHeader" title="點擊可排序">名稱</th>
                 <th>影片</th>
                 <th>MP3</th>
                 <th>文字檔</th>
@@ -88,6 +106,8 @@
         // 點擊名稱標題時切換排序
         $('#nameHeader').on('click', function() {
             sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+            $('#nameHeader').find('.sort-arrow').remove();
+            $('#nameHeader').append(`<span class="sort-arrow">${sortOrder === 'asc' ? '↑' : '↓'}</span>`);
             loadFiles();
         });
 
@@ -98,7 +118,7 @@
             $('#filesTable tbody').empty();
 
             $.ajax({
-                url: `https://filesys-backend-1.onrender.com/api/files?sort=name&order=${sortOrder}`, // 使用實際後端域名
+                url: `https://filesys-backend-1.onrender.com/api/files?sort=name&order=${sortOrder}`,
                 method: 'GET',
                 success: function(files) {
                     $('#loading').hide();
